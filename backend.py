@@ -11,13 +11,13 @@ from ultralytics import YOLO
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # w produkcji ustaw konkretną domenę
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Ładowanie modelu YOLO (podmień ścieżkę na swoją)
+
 MODEL_PATH = "best.pt"
 model = YOLO(MODEL_PATH)
 CLASS_NAMES = model.names
@@ -62,7 +62,7 @@ async def ws_endpoint(websocket: WebSocket):
             message = await websocket.receive_text()
             payload = json.loads(message)
 
-            # Oczekujemy {"image": "data:image/jpeg;base64,..."}
+           
             data_url = payload.get("image")
             if not data_url or "," not in data_url:
                 await websocket.send_text(json.dumps({"error": "invalid_image"}))
@@ -79,5 +79,5 @@ async def ws_endpoint(websocket: WebSocket):
             result = run_detection(frame_bgr)
             await websocket.send_text(json.dumps(result))
     except Exception as e:
-        # W produkcji zaloguj błąd
+      
         await websocket.close()
