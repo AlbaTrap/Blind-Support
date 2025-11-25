@@ -2,8 +2,8 @@ import base64
 import io
 import json
 from typing import List, Dict, Any
-import cv2
 import numpy as np
+from PIL import Image
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLO
@@ -71,14 +71,14 @@ async def ws_endpoint(websocket: WebSocket):
 
             header, b64data = data_url.split(",", 1)
             img_bytes = base64.b64decode(b64data)
-            nparr = np.frombuffer(img_bytes, np.uint8)
-            frame_bgr = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            if frame_bgr is None:
+            try:
+                image = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                frame_bgr = np.array(image) 
+            except Exception:
                 await websocket.send_text(json.dumps({"error": "decode_failed"}))
                 continue
 
             result = run_detection(frame_bgr)
             await websocket.send_text(json.dumps(result))
     except Exception as e:
-
         await websocket.close()
