@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 # Ładowanie modelu YOLO (podmień ścieżkę na swoją)
-MODEL_PATH = "F:/Diploma/runs/detect/train3/weights/best.pt"
+MODEL_PATH = "best.pt"
 model = YOLO(MODEL_PATH)
 CLASS_NAMES = model.names
 
